@@ -5,11 +5,12 @@ require 'telegram/bot'
 class Server
   OTODOM = 'https://www.otodom.pl/'
 
-  attr_reader :redis, :scrapper, :bot
+  attr_reader :storage, :scrapper, :bot
 
   def initialize
     @scrapper = Scrapper.new
-    @redis = Redis.new
+    # @redis = Redis.new
+    @storage = Hash.new
     @bot = Telegram::Bot::Client.new(ENV["TELEGRAM_TOKEN"])
   end
 
@@ -26,10 +27,12 @@ class Server
       puts "Found #{links.count} offers"
 
       links.each do |link|
-        unless redis.exists(link).positive?
+        # unless redis.exists(link).positive?
+        if storage[link].nil?
           puts "Found new flat, saving the link in storage..."
 
-          redis.set(link, 1)
+          # redis.set(link, 1)
+          storage[link] = link
 
           send_notification(link)
 
@@ -61,7 +64,7 @@ class Server
     puts 'Run cold start'
 
     scrapper.offer_links.each do |link|
-      redis.set(link, 1)
+      storage[link] = link
     end
   end
 end
