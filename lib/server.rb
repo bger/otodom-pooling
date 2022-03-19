@@ -14,18 +14,30 @@ class Server
   end
 
   def start
+    puts 'Start server...'
+
     cold_start
 
     loop do
+      puts 'Fetching links...'
+
       links = scrapper.offer_links
+
+      puts "Found #{links.count} offers"
 
       links.each do |link|
         unless redis.exists(link).positive?
+          puts "Found new flat, saving the link in storage..."
+
           redis.set(link, 1)
 
           send_notification(link)
+
+          puts "Notification for #{link} sent."
         end
       end
+
+      puts "Start waiting..."
 
       sleep(600) # 10 minutes
     end
@@ -46,10 +58,10 @@ class Server
 
 
   def cold_start
+    puts 'Run cold start'
+
     scrapper.offer_links.each do |link|
       redis.set(link, 1)
     end
   end
 end
-
-Server.new.start

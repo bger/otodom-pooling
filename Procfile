@@ -1,1 +1,1 @@
-web: ./lib/server.rb
+web: ./bin/start
