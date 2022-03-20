@@ -8,8 +8,10 @@ lib = File.expand_path("../../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Dotenv.load
-require 'observer'
 
+require 'observer'
+require 'otodom_scrapper'
+require 'telegram/bot'
 
 puts 'Start observing.'
 
@@ -18,12 +20,18 @@ observer = Observer.new(
   notifier: Telegram::Bot::Client.new(ENV["TELEGRAM_TOKEN"]).api
 )
 
-loop do
-  puts 'Refreshing state'
+observer.cold_start
 
+if ENV["TIMER"]
+  loop do
+    puts 'Refreshing state'
+
+    observer.refresh
+
+    puts "Start waiting..."
+
+    sleep(ENV["TIMER"].to_i)
+  end
+else
   observer.refresh
-
-  puts "Start waiting..."
-
-  sleep(600)
 end

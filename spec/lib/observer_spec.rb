@@ -40,4 +40,19 @@ RSpec.describe Observer do
       end
     end
   end
+
+  describe '#cold_start' do
+    let(:flats) { ['link1', 'new_flat'] }
+    let(:storage) { {} }
+
+    it 'puts all links into storage' do
+      expect { observer.cold_start }.to change { storage.count }.from(0).to(2)
+    end
+
+    it "doesn't send notification messages" do
+      observer.cold_start
+
+      expect(notifier.messages.count).to eq(0)
+    end
+  end
 end
