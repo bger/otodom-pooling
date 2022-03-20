@@ -2,14 +2,28 @@
 
 require 'rubygems'
 require 'bundler/setup'
-
 Bundler.require(:default)
 
 lib = File.expand_path("../../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Dotenv.load
+require 'observer'
 
-require 'server'
 
-Server.new.start
+puts 'Start observing.'
+
+observer = Observer.new(
+  scrapper: OtodomScrapper.new,
+  notifier: Telegram::Bot::Client.new(ENV["TELEGRAM_TOKEN"]).api
+)
+
+loop do
+  puts 'Refreshing state'
+
+  observer.refresh
+
+  puts "Start waiting..."
+
+  sleep(600)
+end
