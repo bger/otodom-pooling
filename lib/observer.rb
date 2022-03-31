@@ -14,15 +14,14 @@ class Observer
 
     puts "Found #{links.count} offers."
 
-    links.each do |link|
+    new_links = links.map do |link|
       if storage[link].nil?
         puts "Found new flat, saving the link in storage..."
-
         storage[link] = link
-
-        send_notification(link)
       end
-    end
+    end.compact
+
+    send_notification(new_links) if new_links.any?
   end
 
   def cold_start
@@ -35,16 +34,16 @@ class Observer
 
   private
 
-  def send_notification(link)
+  def send_notification(links)
     notifier.send_message(
       chat_id: ENV["TELEGRAM_ACCOUNT_ID"],
       text: <<~MESSAGE
-        Sup mate, I've found a new flat 😎
-        Check this out!
-        Link: -> #{link}
+        Yo bro, I've got something new for you! ヽ(^。^)丿 Wanna see? (⌐■_■)
+        It's yours 彡ﾟ◉ω◉ )つー☆*
+        #{links.map.with_index {|link, index| "#{index + 1}. #{link}"}.join("\n")}
       MESSAGE
     )
 
-    puts "Notification for #{link} sent."
+    puts "Sent notification of #{links.count} new flats"
   end
 end

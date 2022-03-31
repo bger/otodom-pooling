@@ -21,6 +21,13 @@ RSpec.describe Observer do
   end
   let(:storage) { Hash.new }
 
+  before(:all) do
+    $stdout = open('/dev/null', 'w')
+  end
+  after(:all) do
+    $stdout = STDOUT
+  end
+
   describe '#refresh' do
     context "when there is a new flat" do
       let(:flats) { ['link1', 'new_flat'] }
@@ -37,6 +44,31 @@ RSpec.describe Observer do
 
         expect(notifier.messages.count).to eq(1)
         expect(notifier)
+      end
+    end
+
+    context "when there are many new flats" do
+      let(:flats) { ['flat1', '_flat2', '_flat3'] }
+      let(:storage) { {'flat1' => 'flat1'} }
+
+      it 'puts them to the storage' do
+        observer.refresh
+
+        expect(storage.keys).to include('_flat2', '_flat3')
+      end
+
+      it 'sends notification message' do
+        observer.refresh
+
+        expect(notifier.messages.count).to eq(1)
+
+        expect(notifier.messages.first[:text]).to eq(<<~MESSAGE
+          Yo bro, I've got something new for you! ヽ(^。^)丿 Wanna see? (⌐■_■)
+          It's yours 彡ﾟ◉ω◉ )つー☆*
+          1. _flat2
+          2. _flat3
+        MESSAGE
+        )
       end
     end
   end

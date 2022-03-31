@@ -11,27 +11,41 @@ Dotenv.load
 
 require 'observer'
 require 'otodom_scrapper'
+require 'olx_scrapper'
 require 'telegram/bot'
 
 puts 'Start observing.'
 
-observer = Observer.new(
+telegram_notifier = Telegram::Bot::Client.new(ENV["TELEGRAM_TOKEN"]).api
+
+otodom_observer = Observer.new(
   scrapper: OtodomScrapper.new,
-  notifier: Telegram::Bot::Client.new(ENV["TELEGRAM_TOKEN"]).api
+  notifier: telegram_notifier
 )
 
-observer.cold_start
+olx_observer = Observer.new(
+  scrapper: OlxScrapper.new,
+  notifier: telegram_notifier
+)
+
+otodom_observer.cold_start
+olx_observer.cold_start
 
 if ENV["TIMER"]
   loop do
     puts 'Refreshing state'
 
-    observer.refresh
+    puts "Checking otodom offers..."
+    otodom_observer.refresh
+
+    puts "Checking olx offers..."
+    olx_observer.refresh
 
     puts "Start waiting..."
 
     sleep(ENV["TIMER"].to_i)
   end
 else
-  observer.refresh
+  otodom_observer.refresh
+  olx_observer.refresh
 end
