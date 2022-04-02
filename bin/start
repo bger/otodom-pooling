@@ -16,7 +16,7 @@ require 'telegram/bot'
 
 puts 'Start observing.'
 
-telegram_notifier = Telegram::Bot::Client.new(ENV["TELEGRAM_TOKEN"]).api
+telegram_notifier = Telegram::Bot::Client.new(ENV["TELEGRAM_BOT_TOKEN"]).api
 
 otodom_observer = Observer.new(
   scrapper: OtodomScrapper.new,

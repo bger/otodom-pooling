@@ -8,7 +8,7 @@ class OtodomScrapper
     links = Set.new
 
     loop do
-      page = HTTParty.get(ENV['OFFERS_URL'].gsub(/page=./, "page=#{page_number}"))
+      page = HTTParty.get(ENV['OTODOM_URL'].gsub(/page=./, "page=#{page_number}"))
       node = Nokogiri::HTML(page.body)
 
       break if node.search("//@data-cy='no-search-results'")

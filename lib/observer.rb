@@ -36,7 +36,7 @@ class Observer
 
   def send_notification(links)
     notifier.send_message(
-      chat_id: ENV["TELEGRAM_ACCOUNT_ID"],
+      chat_id: ENV["TELEGRAM_CHAT_ID"],
       text: <<~MESSAGE
         Yo bro, I've got something new for you! ヽ(^。^)丿 Wanna see? (⌐■_■)
         It's yours 彡ﾟ◉ω◉ )つー☆*
